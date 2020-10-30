@@ -8,5 +8,14 @@
     "require-dev": {
         "vimeo/psalm": "^4.1",
         "phpunit/phpunit": "^9.4"
+    },
+    "scripts": {
+        "check" : [
+            "psalm",
+            "@test"
+        ],
+        "test" : [
+            "phpunit"
+        ]
     }
 }
