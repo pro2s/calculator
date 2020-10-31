@@ -3,54 +3,44 @@
 namespace Parser;
 
 use Parser\Operators\Add;
+use Parser\Operators\Div;
+use Parser\Operators\Mod;
+use Parser\Operators\Pow;
 use Parser\Operators\Sub;
 use Parser\Operators\Mult;
 use Parser\Operators\OpenBracket;
 use Parser\Operators\CloseBracket;
-use Parser\Operators\AbstractOperator;
-use Parser\Operands\OperandInterface;
-use Parser\Operands\DecimalOperand;
+use Parser\Operands\DecimalFactory;
 use Parser\Exceptions\ParseException;
+use Parser\Operands\OperandInterface;
 use Parser\Exceptions\SyntaxException;
 use Parser\Exceptions\RuntimeException;
+use Parser\Operators\OperatorInterface;
+use Parser\Operands\OperandFactoryInterface;
 
 class ShuntingYard implements ParserInterface
 {
-    public const DIV = '/';
-    public const POW = '^';
-    public const MOD = '%';
-
-    public const LEFT = 0;
-    public const RIGHT = 1;
-
-    public const PRECEDENCE = [
-        self::DIV => 3,
-        self::MOD => 3,
-        self::POW => 4,
-    ];
-
-    public const ASSOC = [
-        self::DIV => self::LEFT,
-        self::MOD => self::LEFT,
-        self::POW => self::RIGHT,
-    ];
-
-    /**
-     * @var (null|numeric|string)[]
-     */
-    private $queue = [];
-
     /**
      * @var Tokinizer
      */
     private $tokenizer;
 
+    /**
+     * @var OperandFactoryInterface
+     */
+    private $operandFactory;
+
     public function __construct()
     {
+        $this->operandFactory = new DecimalFactory();
         $this->tokenizer = new Tokinizer(
+            $this->operandFactory,
             new Add(),
             new Sub(),
             new Mult(),
+            new Div(),
+            new Mod(),
+            new Pow(),
             new OpenBracket(),
             new CloseBracket()
         );
@@ -69,13 +59,15 @@ class ShuntingYard implements ParserInterface
     }
 
     /**
-     * @param (AbstractOperator|OperandInterface)[] $tokens
+     * @param (OperatorInterface|OperandInterface)[] $tokens
+     *
+     * @return (OperatorInterface|OperandInterface)[]
      */
     public function getRPN(array $tokens): array
     {
-        /** @var AbstractOperator[] $stack */
+        /** @var OperatorInterface[] $stack */
         $stack = [];
-        /** @var (AbstractOperator|OperandInterface)[] $rpn */
+        /** @var (OperatorInterface|OperandInterface)[] $rpn */
         $rpn = [];
 
         foreach($tokens as $token) {
@@ -87,14 +79,12 @@ class ShuntingYard implements ParserInterface
             } elseif ($token instanceof OpenBracket) {
                 // push it onto the operator stack.
                 $stack[] = $token;
-
             // if the token is a right bracket (i.e. ")"), then:
             } elseif ($token instanceof CloseBracket) {
                 // while the operator at the top of the operator stack is not a left bracket:
                 while (!(end($stack) instanceof OpenBracket)) {
                     // pop operators from the operator stack onto the output queue.
                     $rpn[] = array_pop($stack);
-
                     // if the stack runs out without finding a left bracket, then there are
                     // mismatched parentheses. */
                     if (!$stack) {
@@ -104,7 +94,7 @@ class ShuntingYard implements ParserInterface
                 // pop the left bracket from the stack.
                 array_pop($stack);
                 // if the token is an operator, then:
-            } elseif ($token instanceof AbstractOperator) {
+            } else {
                 // while there is an operator at the top of the operator stack with
                 // greater than or equal to precedence:
                 while ($stack && $token->lessOrEqual(end($stack))) {
@@ -113,8 +103,6 @@ class ShuntingYard implements ParserInterface
                 }
                 // push the read operator onto the operator stack.
                 $stack[] = $token;
-            } else {
-                throw new ParseException("Unexpected token $token");
             }
         }
 
@@ -130,23 +118,26 @@ class ShuntingYard implements ParserInterface
     }
 
     /**
+     * @param (OperatorInterface|OperandInterface)[] $rpn
+     *
      * @return numeric
      */
     public function calculate(array $rpn)
     {
-        /** @var OperandInterface[] */
         $operands = [];
 
         foreach($rpn as $token) {
             if ($token instanceof OperandInterface) {
                 $operands[] = $token;
-            } else if ($token instanceof AbstractOperator) {
+            } else {
                 $second = array_pop($operands);
                 $first = array_pop($operands);
-                // TODO: Replace with fabric
-                $operands[] = new DecimalOperand($token->apply($first, $second));
-            } else {
-                throw new RuntimeException('Uncknown argument');
+
+                if(!($first instanceof OperandInterface && $second instanceof OperandInterface)) {
+                    throw new RuntimeException('Wrong arguments');
+                }
+
+                $operands[] = $this->operandFactory->create($token->apply($first, $second));
             }
         }
 

@@ -2,22 +2,30 @@
 
 namespace Parser;
 
-use Parser\Operators\AbstractOperator;
-use Parser\Operands\DecimalOperand;
-use Parser\Operands\OperandInterface;
 use Parser\Exceptions\ParseException;
+use Parser\Operands\OperandInterface;
 use Parser\Exceptions\SyntaxException;
 use Parser\Exceptions\RuntimeException;
+use Parser\Operators\OperatorInterface;
+use Parser\Operands\OperandFactoryInterface;
 
 class Tokinizer
 {
     /**
-     * @var AbstractOperator[]
+     * @var OperatorInterface[]
      */
     private $tokens = [];
 
-    public function __construct(AbstractOperator ...$operators)
-    {
+    /**
+     * @var OperandFactoryInterface
+     */
+    private $operandFactory;
+
+    public function __construct(
+        OperandFactoryInterface $operandFactory,
+        OperatorInterface ...$operators
+    ) {
+        $this->operandFactory = $operandFactory;
         foreach ($operators as $operator) {
             $this->tokens[$operator->getToken()] = $operator;
         }
@@ -39,10 +47,10 @@ class Tokinizer
     }
 
     /**
-     * @param string[] $tokens
+     * @param (OperatorInterface|OperandInterface)[] $tokens
      * @param string $token
      *
-     * @return (AbstractOperator|OperandInterface)[]
+     * @return (OperatorInterface|OperandInterface)[]
      */
     private function parseToken(array $tokens, string $token): array
     {
@@ -55,10 +63,9 @@ class Tokinizer
         if (end($tokens) instanceof OperandInterface) {
             $operand = array_pop($tokens);
         } else {
-            // TODO: Replace with fabric
-            $operand = new DecimalOperand();
+            $operand = $this->operandFactory->create();
         }
-
+        /** @var OperandInterface $operand */
         $operand->parseToken($token);
 
         $tokens[] = $operand;
@@ -67,16 +74,17 @@ class Tokinizer
     }
 
     /**
-     * @return (AbstractOperator|OperandInterface)[]
+     * @return (OperatorInterface|OperandInterface)[]
      */
     public function tokenize(string $string): array
     {
         $chars = $this->splitString($string);
+        $tokens = [];
 
-        return array_reduce(
-            $chars,
-            fn (array $acc, string $char): array => $this->parseToken($acc, $char),
-            []
-        );
+        foreach ($chars as $char) {
+            $tokens = $this->parseToken($tokens, $char);
+        };
+
+        return $tokens;
     }
 }

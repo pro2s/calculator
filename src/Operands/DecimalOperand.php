@@ -19,6 +19,9 @@ class DecimalOperand implements OperandInterface
      */
     private $value;
 
+    /**
+     * @param numeric|null $value
+     */
     public function __construct($value = null)
     {
         $this->value = $value;

@@ -4,11 +4,7 @@ namespace Parser\Operators;
 
 use Parser\Operands\OperandInterface;
 
-class CloseBracket extends BaseOperator
+class CloseBracket extends EmptyOperator
 {
     protected const TOKEN = ')';
-
-    public function apply(OperandInterface $operandA, OperandInterface $operandB)
-    {
-    }
 }

@@ -12,7 +12,7 @@ interface OperandInterface
     public function parseToken(string $token): OperandInterface;
 
     /**
-     * @param numeric $value
+     * @param numeric|null $value
      */
     public function __construct($value = null);
 }
