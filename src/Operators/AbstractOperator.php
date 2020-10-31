@@ -2,6 +2,8 @@
 
 namespace Parser\Operators;
 
+use Parser\Operands\OperandInterface;
+
 abstract class AbstractOperator
 {
     protected const TOKEN = '';
@@ -19,12 +21,9 @@ abstract class AbstractOperator
     abstract public function getPercendence(): int;
 
     /**
-     * @param numeric $operandA
-     * @param numeric $operandB
-     *
      * @return numeric
      */
-    abstract public function apply($operandA, $operandB);
+    abstract public function apply(OperandInterface $operandA, OperandInterface $operandB);
 
     public function getToken(): string
     {

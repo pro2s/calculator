@@ -2,15 +2,15 @@
 
 namespace Parser;
 
+use Parser\Operators\AbstractOperator;
+use Parser\Operands\DecimalOperand;
+use Parser\Operands\OperandInterface;
 use Parser\Exceptions\ParseException;
 use Parser\Exceptions\SyntaxException;
-use Parser\Operators\AbstractOperator;
 use Parser\Exceptions\RuntimeException;
 
 class Tokinizer
 {
-    public const NUMBERS = '0123456789.';
-
     /**
      * @var AbstractOperator[]
      */
@@ -23,65 +23,58 @@ class Tokinizer
         }
     }
 
-    private function isNumber(string $char): bool
-    {
-        return strspn($char, self::NUMBERS) !== 0;
-    }
-
     private function isToken(string $char): bool
     {
         return isset($this->tokens[$char]);
     }
 
     /**
-     * @param (AbstractOperator|string)[] $acc
-     * @param string $char
-     *
-     * @return (AbstractOperator|string)[]
+     * @return string[]
      */
-    public function addNumbers(array $acc, string $char): array
+    private function splitString(string $string): array
     {
-        $last = end($acc);
-        if ($last === false || $last instanceof AbstractOperator) {
-            $numbers = '';
-        } else {
-            $numbers = array_pop($acc);
-        }
+        $chars = str_split($string);
 
-        /** @var string $numbers  */
-        $acc[] = $numbers . $char;
-
-        return $acc;
+        return array_filter($chars, fn (string $char): bool => strlen(trim($char)) !== 0);
     }
 
     /**
      * @param string[] $tokens
      * @param string $token
      *
-     * @return (AbstractOperator|string)[]
+     * @return (AbstractOperator|OperandInterface)[]
      */
     private function parseToken(array $tokens, string $token): array
     {
-        if ($this->isNumber($token)) {
-            return $this->addNumbers($tokens, $token);
-        }
-
         if ($this->isToken($token)) {
             $tokens[] = $this->tokens[$token];
 
             return $tokens;
         }
 
-        throw new SyntaxException("Invalid character $token");
+        if (end($tokens) instanceof OperandInterface) {
+            $operand = array_pop($tokens);
+        } else {
+            // TODO: Replace with fabric
+            $operand = new DecimalOperand();
+        }
+
+        $operand->parseToken($token);
+
+        $tokens[] = $operand;
+
+        return $tokens;
     }
 
     /**
-     * @return (AbstractOperator|string)[]
+     * @return (AbstractOperator|OperandInterface)[]
      */
-    public function tokenize(array $string): array
+    public function tokenize(string $string): array
     {
+        $chars = $this->splitString($string);
+
         return array_reduce(
-            $string,
+            $chars,
             fn (array $acc, string $char): array => $this->parseToken($acc, $char),
             []
         );

@@ -7,9 +7,11 @@ use Parser\Operators\Sub;
 use Parser\Operators\Mult;
 use Parser\Operators\OpenBracket;
 use Parser\Operators\CloseBracket;
+use Parser\Operators\AbstractOperator;
+use Parser\Operands\OperandInterface;
+use Parser\Operands\DecimalOperand;
 use Parser\Exceptions\ParseException;
 use Parser\Exceptions\SyntaxException;
-use Parser\Operators\AbstractOperator;
 use Parser\Exceptions\RuntimeException;
 
 class ShuntingYard implements ParserInterface
@@ -55,47 +57,30 @@ class ShuntingYard implements ParserInterface
     }
 
     /**
-     * @return false|numeric
+     * @return numeric
      */
     public function parse(string $string)
     {
-        $chars = $this->splitString($string);
-
-        $tokens = $this->tokenizer->tokenize($chars);
+        $tokens = $this->tokenizer->tokenize($string);
 
         $rpn = $this->getRPN($tokens);
 
         return $this->calculate($rpn);
     }
 
-    private function isOperator(string $char): bool
-    {
-        return isset($this->operators[$char]);
-    }
-
     /**
-     * @return string[]
-     */
-    private function splitString(string $string): array
-    {
-        $chars = str_split($string);
-
-        return array_filter($chars, fn (string $char): bool => strlen(trim($char)) !== 0);
-    }
-
-    /**
-     * @param (AbstractOperator|string)[] $tokens
+     * @param (AbstractOperator|OperandInterface)[] $tokens
      */
     public function getRPN(array $tokens): array
     {
         /** @var AbstractOperator[] $stack */
         $stack = [];
-        /** @var (numeric|AbstractOperator)[] $rpn */
+        /** @var (AbstractOperator|OperandInterface)[] $rpn */
         $rpn = [];
 
-        while ($token = array_shift($tokens)) {
+        foreach($tokens as $token) {
             // if the token is a number, then push it to the output queue.
-            if (is_numeric($token)) {
+            if ($token instanceof OperandInterface) {
                 $rpn[] = $token;
 
             // if the token is a left bracket (i.e. "("), then:
@@ -145,24 +130,31 @@ class ShuntingYard implements ParserInterface
     }
 
     /**
-     * @return false|numeric
+     * @return numeric
      */
     public function calculate(array $rpn)
     {
-        /** @var numeric[] */
-        $stack = [];
-        while ($token = array_shift($rpn)) {
-            if (is_numeric($token)) {
-                $stack[] = $token;
+        /** @var OperandInterface[] */
+        $operands = [];
+
+        foreach($rpn as $token) {
+            if ($token instanceof OperandInterface) {
+                $operands[] = $token;
             } else if ($token instanceof AbstractOperator) {
-                $secondOperand = array_pop($stack);
-                $firstOperand = array_pop($stack);
-                $stack[] = $token->apply($firstOperand, $secondOperand);
+                $second = array_pop($operands);
+                $first = array_pop($operands);
+                // TODO: Replace with fabric
+                $operands[] = new DecimalOperand($token->apply($first, $second));
             } else {
                 throw new RuntimeException('Uncknown argument');
             }
         }
 
-        return end($stack);
+        $operand = end($operands);
+        if ($operand instanceof OperandInterface) {
+            return $operand->getValue();
+        }
+
+        throw new RuntimeException('Unexcepted result');
     }
 }
