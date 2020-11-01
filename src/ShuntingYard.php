@@ -11,11 +11,13 @@ use Parser\Operators\Mult;
 use Parser\Operators\OpenBracket;
 use Parser\Operators\CloseBracket;
 use Parser\Operands\DecimalFactory;
+use Parser\Calculators\RPNCalculator;
 use Parser\Exceptions\ParseException;
 use Parser\Operands\OperandInterface;
 use Parser\Exceptions\SyntaxException;
 use Parser\Exceptions\RuntimeException;
 use Parser\Operators\OperatorInterface;
+use Parser\Calculators\CalculatorInterface;
 use Parser\Operands\OperandFactoryInterface;
 
 class ShuntingYard implements ParserInterface
@@ -26,15 +28,15 @@ class ShuntingYard implements ParserInterface
     private $tokenizer;
 
     /**
-     * @var OperandFactoryInterface
+     * @var CalculatorInterface
      */
-    private $operandFactory;
+    private $calculator;
 
     public function __construct()
     {
-        $this->operandFactory = new DecimalFactory();
+        $this->calculator = new RPNCalculator(new DecimalFactory());
         $this->tokenizer = new Tokinizer(
-            $this->operandFactory,
+            new DecimalFactory(),
             new Add(),
             new Sub(),
             new Mult(),
@@ -53,9 +55,9 @@ class ShuntingYard implements ParserInterface
     {
         $tokens = $this->tokenizer->tokenize($string);
 
-        $rpn = $this->getRPN($tokens);
+        $rpnTokens = $this->getRPN($tokens);
 
-        return $this->calculate($rpn);
+        return $this->calculator->calculate($rpnTokens);
     }
 
     /**
@@ -115,37 +117,5 @@ class ShuntingYard implements ParserInterface
         }
 
         return $rpn;
-    }
-
-    /**
-     * @param (OperatorInterface|OperandInterface)[] $rpn
-     *
-     * @return numeric
-     */
-    public function calculate(array $rpn)
-    {
-        $operands = [];
-
-        foreach($rpn as $token) {
-            if ($token instanceof OperandInterface) {
-                $operands[] = $token;
-            } else {
-                $second = array_pop($operands);
-                $first = array_pop($operands);
-
-                if(!($first instanceof OperandInterface && $second instanceof OperandInterface)) {
-                    throw new RuntimeException('Wrong arguments');
-                }
-
-                $operands[] = $this->operandFactory->create($token->apply($first, $second));
-            }
-        }
-
-        $operand = end($operands);
-        if ($operand instanceof OperandInterface) {
-            return $operand->getValue();
-        }
-
-        throw new RuntimeException('Unexcepted result');
     }
 }
