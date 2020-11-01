@@ -47,10 +47,10 @@ class Tokinizer
     }
 
     /**
-     * @param (OperatorInterface|OperandInterface)[] $tokens
+     * @param list<OperatorInterface|OperandInterface> $tokens
      * @param string $token
      *
-     * @return (OperatorInterface|OperandInterface)[]
+     * @return list<OperatorInterface|OperandInterface>
      */
     private function parseToken(array $tokens, string $token): array
     {
@@ -74,7 +74,7 @@ class Tokinizer
     }
 
     /**
-     * @return (OperatorInterface|OperandInterface)[]
+     * @return list<OperatorInterface|OperandInterface>
      */
     public function tokenize(string $string): array
     {

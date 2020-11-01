@@ -61,15 +61,15 @@ class ShuntingYard implements ParserInterface
     }
 
     /**
-     * @param (OperatorInterface|OperandInterface)[] $tokens
+     * @param list<OperatorInterface|OperandInterface> $tokens
      *
-     * @return (OperatorInterface|OperandInterface)[]
+     * @return list<OperatorInterface|OperandInterface>
      */
     public function getRPN(array $tokens): array
     {
         /** @var OperatorInterface[] $stack */
         $stack = [];
-        /** @var (OperatorInterface|OperandInterface)[] $rpn */
+        /** @var list<OperatorInterface|OperandInterface> $rpn */
         $rpn = [];
 
         foreach($tokens as $token) {
