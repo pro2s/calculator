@@ -61,13 +61,14 @@ class ShuntingYard implements ParserInterface
     }
 
     /**
+     * Implemeys of https://en.wikipedia.org/wiki/Shunting-yard_algorithm
      * @param list<OperatorInterface|OperandInterface> $tokens
      *
      * @return list<OperatorInterface|OperandInterface>
      */
     public function getRPN(array $tokens): array
     {
-        /** @var OperatorInterface[] $stack */
+        /** @var list<OperatorInterface> $stack */
         $stack = [];
         /** @var list<OperatorInterface|OperandInterface> $rpn */
         $rpn = [];
@@ -108,7 +109,10 @@ class ShuntingYard implements ParserInterface
             }
         }
 
+        // After while loop, if operator stack not null, pop everything to output queue
         while ($token = array_pop($stack)) {
+            // If the operator token on the top of the stack is a parenthesis,
+            // then there are mismatched parentheses.
             if ($token instanceof OpenBracket) {
                 throw new ParseException("Mismatched parentheses!");
             }
