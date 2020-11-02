@@ -31,7 +31,7 @@ class RPNCalculator implements CalculatorInterface
                 $second = array_pop($operands);
                 $first = array_pop($operands);
 
-                if (!($first instanceof OperandInterface && $second instanceof OperandInterface)) {
+                if ($first === null || $second === null) {
                     throw new RuntimeException('Wrong arguments');
                 }
 
