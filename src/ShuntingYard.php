@@ -61,65 +61,62 @@ class ShuntingYard implements ParserInterface
     }
 
     /**
-     * Implemeys of https://en.wikipedia.org/wiki/Shunting-yard_algorithm
-     * @param list<OperatorInterface|OperandInterface> $tokens
+     * Implements of https://en.wikipedia.org/wiki/Shunting-yard_algorithm
+     * @param \Iterator<OperatorInterface|OperandInterface> $tokens
      *
-     * @return list<OperatorInterface|OperandInterface>
+     * @return \Generator<OperatorInterface|OperandInterface>
      */
-    public function getRPN(array $tokens): array
+    public function getRPN(\Iterator $tokens): \Generator
     {
-        /** @var list<OperatorInterface> $stack */
-        $stack = [];
-        /** @var list<OperatorInterface|OperandInterface> $rpn */
-        $rpn = [];
+        /** @var \SplStack<OperatorInterface> $stack */
+        $stack = new \SplStack();
 
-        foreach($tokens as $token) {
+        foreach ($tokens as $token) {
             // if the token is a number, then push it to the output queue.
             if ($token instanceof OperandInterface) {
-                $rpn[] = $token;
+                yield $token;
 
             // if the token is a left bracket (i.e. "("), then:
             } elseif ($token instanceof OpenBracket) {
                 // push it onto the operator stack.
-                $stack[] = $token;
+                $stack->push($token);
             // if the token is a right bracket (i.e. ")"), then:
             } elseif ($token instanceof CloseBracket) {
                 // while the operator at the top of the operator stack is not a left bracket:
-                while (!(end($stack) instanceof OpenBracket)) {
+                while (!($stack->top() instanceof OpenBracket)) {
                     // pop operators from the operator stack onto the output queue.
-                    $rpn[] = array_pop($stack);
+                    yield $stack->pop();
                     // if the stack runs out without finding a left bracket, then there are
                     // mismatched parentheses. */
-                    if (!$stack) {
+                    if ($stack->isEmpty()) {
                         throw new ParseException("Mismatched parentheses!");
                     }
                 }
                 // pop the left bracket from the stack.
-                array_pop($stack);
-                // if the token is an operator, then:
+                $stack->pop();
+            // if the token is an operator, then:
             } else {
                 // while there is an operator at the top of the operator stack with
                 // greater than or equal to precedence:
-                while ($stack && $token->lessOrEqual(end($stack))) {
+                while (!$stack->isEmpty() && $token->lessOrEqual($stack->top())) {
                     // pop operators from the operator stack, onto the output queue.
-                    $rpn[] = array_pop($stack);
+                    yield $stack->pop();
                 }
                 // push the read operator onto the operator stack.
-                $stack[] = $token;
+                $stack->push($token);
             }
         }
 
-        // After while loop, if operator stack not null, pop everything to output queue
-        while ($token = array_pop($stack)) {
-            // If the operator token on the top of the stack is a parenthesis,
+        // after while loop, if operator stack not null
+        while (!$stack->isEmpty()) {
+            $token = $stack->pop();
+            // if the operator token on the top of the stack is a parenthesis,
             // then there are mismatched parentheses.
             if ($token instanceof OpenBracket) {
                 throw new ParseException("Mismatched parentheses!");
             }
-
-            $rpn[] = $token;
+            // pop everything to output queue
+            yield $token;
         }
-
-        return $rpn;
     }
 }

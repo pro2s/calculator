@@ -2,10 +2,7 @@
 
 namespace Parser;
 
-use Parser\Exceptions\ParseException;
 use Parser\Operands\OperandInterface;
-use Parser\Exceptions\SyntaxException;
-use Parser\Exceptions\RuntimeException;
 use Parser\Operators\OperatorInterface;
 use Parser\Operands\OperandFactoryInterface;
 
@@ -14,7 +11,7 @@ class Tokinizer
     /**
      * @var OperatorInterface[]
      */
-    private $tokens = [];
+    private $operators = [];
 
     /**
      * @var OperandFactoryInterface
@@ -27,64 +24,60 @@ class Tokinizer
     ) {
         $this->operandFactory = $operandFactory;
         foreach ($operators as $operator) {
-            $this->tokens[$operator->getToken()] = $operator;
+            $this->operators[$operator->getToken()] = $operator;
         }
     }
 
-    private function isToken(string $char): bool
+    private function isOperator(string $char): bool
     {
-        return isset($this->tokens[$char]);
+        return isset($this->operators[$char]);
+    }
+
+    private function getOperand(string $token): OperandInterface
+    {
+        return $this->operandFactory->create($token);
+    }
+
+    private function getOperator(string $token): OperatorInterface
+    {
+        return $this->operators[$token];
+    }
+
+    public function getOperatorsPattern(): string
+    {
+        $symbols = \preg_quote(implode('', \array_keys($this->operators)), '/');
+
+        return "/([$symbols])/";
     }
 
     /**
      * @return string[]
      */
-    private function splitString(string $string): array
+    private function parseString(string $string): array
     {
-        $chars = str_split($string);
+        $tokens = \preg_split($this->getOperatorsPattern(), $string, -1, PREG_SPLIT_DELIM_CAPTURE);
 
-        return array_filter($chars, fn (string $char): bool => strlen(trim($char)) !== 0);
+        return \array_map(fn (string $token): string => trim($token), $tokens);
     }
 
     /**
-     * @param list<OperatorInterface|OperandInterface> $tokens
-     * @param string $token
-     *
-     * @return list<OperatorInterface|OperandInterface>
+     * @return \Generator<OperatorInterface|OperandInterface>
      */
-    private function parseToken(array $tokens, string $token): array
+    public function tokenize(string $string): \Generator
     {
-        if ($this->isToken($token)) {
-            $tokens[] = $this->tokens[$token];
+        $tokens = $this->parseString($string);
 
-            return $tokens;
-        }
+        foreach ($tokens as $token) {
+            if (empty($token)) {
+                continue;
+            }
 
-        if (end($tokens) instanceof OperandInterface) {
-            $operand = array_pop($tokens);
-        } else {
-            $operand = $this->operandFactory->create();
-        }
-        /** @var OperandInterface $operand */
-        $operand->parseToken($token);
+            if ($this->isOperator($token)) {
+                yield $this->getOperator($token);
+                continue;
+            }
 
-        $tokens[] = $operand;
-
-        return $tokens;
-    }
-
-    /**
-     * @return list<OperatorInterface|OperandInterface>
-     */
-    public function tokenize(string $string): array
-    {
-        $chars = $this->splitString($string);
-        $tokens = [];
-
-        foreach ($chars as $char) {
-            $tokens = $this->parseToken($tokens, $char);
+            yield $this->getOperand($token);
         };
-
-        return $tokens;
     }
 }

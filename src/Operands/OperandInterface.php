@@ -9,10 +9,8 @@ interface OperandInterface
      */
     public function getValue();
 
-    public function parseToken(string $token): OperandInterface;
-
     /**
-     * @param numeric|null $value
+     * @param mixed $value
      */
-    public function __construct($value = null);
+    public function __construct($value);
 }

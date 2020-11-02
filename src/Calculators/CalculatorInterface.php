@@ -7,5 +7,5 @@ interface CalculatorInterface
     /**
      *  @return numeric
      */
-    public function calculate(array $tokens);
+    public function calculate(\Iterator $tokens);
 }

@@ -18,20 +18,20 @@ class RPNCalculator implements CalculatorInterface
     }
 
     /**
-     * @param list<OperatorInterface|OperandInterface> $tokens
+     * @param \Iterator<OperatorInterface|OperandInterface> $tokens
      */
-    public function calculate(array $tokens)
+    public function calculate(\Iterator $tokens)
     {
         $operands = [];
 
-        foreach($tokens as $token) {
+        foreach ($tokens as $token) {
             if ($token instanceof OperandInterface) {
                 $operands[] = $token;
             } else {
                 $second = array_pop($operands);
                 $first = array_pop($operands);
 
-                if(!($first instanceof OperandInterface && $second instanceof OperandInterface)) {
+                if (!($first instanceof OperandInterface && $second instanceof OperandInterface)) {
                     throw new RuntimeException('Wrong arguments');
                 }
 
