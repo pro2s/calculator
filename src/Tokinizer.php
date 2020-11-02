@@ -14,18 +14,34 @@ class Tokinizer
     private $operators = [];
 
     /**
+     * @var string
+     */
+    private $operatorsPattern = '';
+
+    /**
      * @var OperandFactoryInterface
      */
     private $operandFactory;
+
+    /**
+     * @var string[]
+     */
+    private $delimiters = [','];
 
     public function __construct(
         OperandFactoryInterface $operandFactory,
         OperatorInterface ...$operators
     ) {
         $this->operandFactory = $operandFactory;
+
+        $tokens = [];
         foreach ($operators as $operator) {
-            $this->operators[$operator->getToken()] = $operator;
+            $token = $operator->getToken();
+            $this->operators[$token] = $operator;
+            $tokens[] = \preg_quote($token, '/');
         }
+
+        $this->operatorsPattern = implode('|', array_merge($tokens, $this->delimiters));
     }
 
     private function isOperator(string $char): bool
@@ -45,9 +61,7 @@ class Tokinizer
 
     public function getOperatorsPattern(): string
     {
-        $symbols = \preg_quote(implode('', \array_keys($this->operators)), '/');
-
-        return "/([$symbols])/";
+        return "/($this->operatorsPattern)/";
     }
 
     /**
@@ -60,6 +74,11 @@ class Tokinizer
         return \array_map(fn (string $token): string => trim($token), $tokens);
     }
 
+    private function isEmpty(string $token): bool
+    {
+        return empty($token) || \in_array($token, $this->delimiters);
+    }
+
     /**
      * @return \Generator<OperatorInterface|OperandInterface>
      */
@@ -68,7 +87,7 @@ class Tokinizer
         $tokens = $this->parseString($string);
 
         foreach ($tokens as $token) {
-            if (empty($token)) {
+            if ($this->isEmpty($token)) {
                 continue;
             }
 

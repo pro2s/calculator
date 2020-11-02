@@ -4,6 +4,7 @@ namespace Parser;
 
 use Parser\Operators\Add;
 use Parser\Operators\Div;
+use Parser\Operators\Min;
 use Parser\Operators\Mod;
 use Parser\Operators\Pow;
 use Parser\Operators\Sub;
@@ -15,6 +16,7 @@ use Parser\Calculators\RPNCalculator;
 use Parser\Exceptions\ParseException;
 use Parser\Operands\OperandInterface;
 use Parser\Exceptions\SyntaxException;
+use Parser\Operators\FunctionOperator;
 use Parser\Exceptions\RuntimeException;
 use Parser\Operators\OperatorInterface;
 use Parser\Calculators\CalculatorInterface;
@@ -37,6 +39,7 @@ class ShuntingYard implements ParserInterface
         $this->calculator = new RPNCalculator(new DecimalFactory());
         $this->tokenizer = new Tokinizer(
             new DecimalFactory(),
+            new Min(),
             new Add(),
             new Sub(),
             new Mult(),
@@ -94,6 +97,8 @@ class ShuntingYard implements ParserInterface
                 }
                 // pop the left bracket from the stack.
                 $stack->pop();
+            } elseif ($token instanceof FunctionOperator) {
+                $stack->push($token);
             // if the token is an operator, then:
             } else {
                 // while there is an operator at the top of the operator stack with
