@@ -9,7 +9,7 @@ interface OperatorInterface
     /**
      * @return numeric
      */
-    public function apply(OperandInterface $operandA, OperandInterface $operandB);
+    public function apply(OperandInterface ...$operands);
 
     public function getToken(): string;
 
@@ -18,4 +18,6 @@ interface OperatorInterface
     public function getAssoc(): int;
 
     public function getPercendence(): int;
+
+    public function getArgumentsCount(): int;
 }

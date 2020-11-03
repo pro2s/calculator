@@ -8,8 +8,10 @@ class Min extends FunctionOperator
 {
     protected const TOKEN = 'min';
 
-    public function apply(OperandInterface $operandA, OperandInterface $operandB)
+    public function apply(OperandInterface ...$operands)
     {
+        [$operandA, $operandB] = $operands;
+
         return min(0 + $operandA->getValue(), 0 + $operandB->getValue());
     }
 }

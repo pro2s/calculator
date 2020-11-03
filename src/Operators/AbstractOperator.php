@@ -9,6 +9,8 @@ abstract class AbstractOperator implements OperatorInterface
 {
     protected const TOKEN = '';
 
+    public const ARGUMENTS_COUNT = 2;
+
     public const LEFT = 0;
     public const RIGHT = 1;
 
@@ -24,7 +26,7 @@ abstract class AbstractOperator implements OperatorInterface
     /**
      * @return numeric
      */
-    abstract public function apply(OperandInterface $operandA, OperandInterface $operandB);
+    abstract public function apply(OperandInterface ...$operands);
 
     public function getToken(): string
     {
@@ -34,5 +36,10 @@ abstract class AbstractOperator implements OperatorInterface
     public function lessOrEqual(OperatorInterface $operator): bool
     {
         return $operator->getPercendence() >= $this->getPercendence() + $this->getAssoc();
+    }
+
+    public function getArgumentsCount(): int
+    {
+        return (int) static::ARGUMENTS_COUNT;
     }
 }

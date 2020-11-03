@@ -17,7 +17,7 @@ class EmptyOperator extends AbstractOperator
         return self::EMPTY_PERCENDENCE;
     }
 
-    public function apply(OperandInterface $operandA, OperandInterface $operandB)
+    public function apply(OperandInterface ...$operands)
     {
         throw new RuntimeException('Operator can not be applied');
     }

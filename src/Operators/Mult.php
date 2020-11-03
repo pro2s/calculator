@@ -8,8 +8,10 @@ class Mult extends BasicOperator
 {
     protected const TOKEN = '*';
 
-    public function apply(OperandInterface $operandA, OperandInterface $operandB)
+    public function apply(OperandInterface ...$operands)
     {
+        [$operandA, $operandB] = $operands;
+
         return $operandA->getValue() * $operandB->getValue();
     }
 }

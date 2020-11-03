@@ -28,14 +28,14 @@ class RPNCalculator implements CalculatorInterface
             if ($token instanceof OperandInterface) {
                 $operands[] = $token;
             } else {
-                $second = array_pop($operands);
-                $first = array_pop($operands);
-
-                if ($first === null || $second === null) {
+                $count = $token->getArgumentsCount();
+                if ($count > count($operands)) {
                     throw new RuntimeException('Wrong arguments');
                 }
+                /** @var list<OperandInterface> $arguments */
+                $arguments = \array_splice($operands, -$count);
 
-                $operands[] = $this->operandFactory->create($token->apply($first, $second));
+                $operands[] = $this->operandFactory->create($token->apply(...$arguments));
             }
         }
 

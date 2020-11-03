@@ -22,6 +22,7 @@ use Parser\Operators\OperatorInterface;
 use Parser\Calculators\CalculatorInterface;
 use Parser\Operands\OperandFactoryInterface;
 use Parser\Operators\Comma;
+use Parser\Operators\Sqrt;
 
 class ShuntingYard implements ParserInterface
 {
@@ -41,6 +42,7 @@ class ShuntingYard implements ParserInterface
         $this->tokenizer = new Tokinizer(
             new DecimalFactory(),
             new Min(),
+            new Sqrt(),
             new Add(),
             new Sub(),
             new Mult(),
