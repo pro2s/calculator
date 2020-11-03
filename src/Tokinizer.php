@@ -71,7 +71,7 @@ class Tokinizer
 
     private function isEmpty(string $token): bool
     {
-        return empty($token);
+        return $token === '';
     }
 
     /**
