@@ -1,9 +1,10 @@
 <?php
 
-namespace Parser\Operators;
+namespace Parser\Syntax;
 
 use Parser\Operands\OperandInterface;
 use Parser\Exceptions\RuntimeException;
+use Parser\Operators\AbstractOperator;
 
 class EmptyOperator extends AbstractOperator
 {

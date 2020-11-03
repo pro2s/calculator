@@ -2,27 +2,27 @@
 
 namespace Parser;
 
+use Parser\Calculators\CalculatorInterface;
+use Parser\Calculators\RPNCalculator;
+use Parser\Exceptions\ParseException;
+use Parser\Exceptions\SyntaxException;
+use Parser\Exceptions\RuntimeException;
+use Parser\Functions\Min;
+use Parser\Functions\Sqrt;
+use Parser\Functions\FunctionOperator;
 use Parser\Operators\Add;
 use Parser\Operators\Div;
-use Parser\Operators\Min;
 use Parser\Operators\Mod;
 use Parser\Operators\Pow;
 use Parser\Operators\Sub;
 use Parser\Operators\Mult;
-use Parser\Operators\OpenBracket;
-use Parser\Operators\CloseBracket;
-use Parser\Operands\DecimalFactory;
-use Parser\Calculators\RPNCalculator;
-use Parser\Exceptions\ParseException;
-use Parser\Operands\OperandInterface;
-use Parser\Exceptions\SyntaxException;
-use Parser\Operators\FunctionOperator;
-use Parser\Exceptions\RuntimeException;
 use Parser\Operators\OperatorInterface;
-use Parser\Calculators\CalculatorInterface;
+use Parser\Operands\DecimalFactory;
+use Parser\Operands\OperandInterface;
 use Parser\Operands\OperandFactoryInterface;
-use Parser\Operators\Comma;
-use Parser\Operators\Sqrt;
+use Parser\Syntax\Comma;
+use Parser\Syntax\OpenBracket;
+use Parser\Syntax\CloseBracket;
 
 class ShuntingYard implements ParserInterface
 {

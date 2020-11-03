@@ -1,6 +1,6 @@
 <?php
 
-namespace Parser\Operators;
+namespace Parser\Syntax;
 
 use Parser\Operands\OperandInterface;
 

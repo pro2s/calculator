@@ -1,8 +1,9 @@
 <?php
 
-namespace Parser\Operators;
+namespace Parser\Functions;
 
 use Parser\Operands\OperandInterface;
+use Parser\Operators\AbstractOperator;
 
 abstract class FunctionOperator extends AbstractOperator
 {
