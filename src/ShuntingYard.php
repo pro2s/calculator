@@ -21,6 +21,7 @@ use Parser\Exceptions\RuntimeException;
 use Parser\Operators\OperatorInterface;
 use Parser\Calculators\CalculatorInterface;
 use Parser\Operands\OperandFactoryInterface;
+use Parser\Operators\Comma;
 
 class ShuntingYard implements ParserInterface
 {
@@ -46,6 +47,7 @@ class ShuntingYard implements ParserInterface
             new Div(),
             new Mod(),
             new Pow(),
+            new Comma(),
             new OpenBracket(),
             new CloseBracket()
         );
@@ -97,9 +99,22 @@ class ShuntingYard implements ParserInterface
                 }
                 // pop the left bracket from the stack.
                 $stack->pop();
+            // if the token is a function token, then push it onto the stack.
             } elseif ($token instanceof FunctionOperator) {
                 $stack->push($token);
-            // if the token is an operator, then:
+            // If the token is a function argument separator (e.g., a comma):
+            } elseif ($token instanceof Comma) {
+                // while the operator at the top of the operator stack is not a left bracket:
+                while (!($stack->top() instanceof OpenBracket)) {
+                    // pop operators from the operator stack onto the output queue.
+                    yield $stack->pop();
+                    // if the stack runs out without finding a left bracket, then there are
+                    // mismatched parentheses. */
+                    if ($stack->isEmpty()) {
+                        throw new ParseException("Mismatched parentheses!");
+                    }
+                }
+                // if the token is an operator, then:
             } else {
                 // while there is an operator at the top of the operator stack with
                 // greater than or equal to precedence:

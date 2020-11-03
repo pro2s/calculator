@@ -23,11 +23,6 @@ class Tokinizer
      */
     private $operandFactory;
 
-    /**
-     * @var string[]
-     */
-    private $delimiters = [','];
-
     public function __construct(
         OperandFactoryInterface $operandFactory,
         OperatorInterface ...$operators
@@ -41,7 +36,7 @@ class Tokinizer
             $tokens[] = \preg_quote($token, '/');
         }
 
-        $this->operatorsPattern = implode('|', array_merge($tokens, $this->delimiters));
+        $this->operatorsPattern = implode('|', $tokens);
     }
 
     private function isOperator(string $char): bool
@@ -76,7 +71,7 @@ class Tokinizer
 
     private function isEmpty(string $token): bool
     {
-        return empty($token) || \in_array($token, $this->delimiters);
+        return empty($token);
     }
 
     /**
