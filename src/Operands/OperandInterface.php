@@ -2,7 +2,9 @@
 
 namespace Parser\Operands;
 
-interface OperandInterface
+use Parser\TokenInterface;
+
+interface OperandInterface extends TokenInterface
 {
     /**
      * @return numeric

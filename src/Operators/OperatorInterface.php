@@ -3,8 +3,9 @@
 namespace Parser\Operators;
 
 use Parser\Operands\OperandInterface;
+use Parser\TokenInterface;
 
-interface OperatorInterface
+interface OperatorInterface extends TokenInterface
 {
     /**
      * @return numeric
@@ -17,7 +18,7 @@ interface OperatorInterface
 
     public function getAssoc(): int;
 
-    public function getPercendence(): int;
+    public function getPrecedence(): int;
 
     public function getArgumentsCount(): int;
 }

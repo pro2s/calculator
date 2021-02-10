@@ -11,7 +11,7 @@ class Pow extends AbstractOperator
         return self::RIGHT;
     }
 
-    public function getPercendence(): int
+    public function getPrecedence(): int
     {
         return self::COMPLEX_PERCENDENCE;
     }

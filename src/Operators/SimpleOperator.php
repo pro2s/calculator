@@ -9,7 +9,7 @@ abstract class SimpleOperator extends AbstractOperator
         return self::LEFT;
     }
 
-    public function getPercendence(): int
+    public function getPrecedence(): int
     {
         return self::SIMPLE_PERCENDENCE;
     }

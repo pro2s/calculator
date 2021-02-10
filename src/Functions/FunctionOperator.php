@@ -12,7 +12,7 @@ abstract class FunctionOperator extends AbstractOperator
         return self::LEFT;
     }
 
-    public function getPercendence(): int
+    public function getPrecedence(): int
     {
         return self::EMPTY_PERCENDENCE;
     }

@@ -21,7 +21,7 @@ abstract class AbstractOperator implements OperatorInterface
 
     abstract public function getAssoc(): int;
 
-    abstract public function getPercendence(): int;
+    abstract public function getPrecedence(): int;
 
     /**
      * @return numeric
@@ -35,7 +35,7 @@ abstract class AbstractOperator implements OperatorInterface
 
     public function lessOrEqual(OperatorInterface $operator): bool
     {
-        return $operator->getPercendence() >= $this->getPercendence() + $this->getAssoc();
+        return $operator->getPrecedence() >= $this->getPrecedence() + $this->getAssoc();
     }
 
     public function getArgumentsCount(): int
