@@ -27,7 +27,7 @@ use Parser\Syntax\CloseBracket;
 class ShuntingYard implements ParserInterface
 {
     /**
-     * @var Tokinizer
+     * @var Tokenizer
      */
     private $tokenizer;
 
@@ -39,7 +39,7 @@ class ShuntingYard implements ParserInterface
     public function __construct()
     {
         $this->calculator = new RPNCalculator(new DecimalFactory());
-        $this->tokenizer = new Tokinizer(
+        $this->tokenizer = new Tokenizer(
             new DecimalFactory(),
             new Min(),
             new Sqrt(),

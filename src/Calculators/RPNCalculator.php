@@ -17,9 +17,6 @@ class RPNCalculator implements CalculatorInterface
         $this->operandFactory = $operandFactory;
     }
 
-    /**
-     * @param \Iterator<OperatorInterface|OperandInterface> $tokens
-     */
     public function calculate(\Iterator $tokens)
     {
         $operands = [];
@@ -44,6 +41,6 @@ class RPNCalculator implements CalculatorInterface
             return $operand->getValue();
         }
 
-        throw new RuntimeException('Unexcepted result');
+        throw new RuntimeException('Unexpected result');
     }
 }

@@ -6,7 +6,7 @@ use Parser\Operands\OperandInterface;
 use Parser\Operators\OperatorInterface;
 use Parser\Operands\OperandFactoryInterface;
 
-class Tokinizer
+class Tokenizer
 {
     /**
      * @var OperatorInterface[]

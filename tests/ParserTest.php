@@ -38,6 +38,7 @@ class ParserTest extends TestCase
             'sqrt' => ['2+sqrt(9)', 5.0],
             'min' => ['2+min(1+1,5)+0',4],
             '2*(1+2)' => ['2*(1+2)', 6],
+            '2*3+2' => ['2*3+2', 8],
             '3*(5-2+1)/2^(1+1)' => ['3 * (5 - 2 + 1) / 2 ^ (1 + 1)', 3],
         ];
     }
@@ -45,7 +46,7 @@ class ParserTest extends TestCase
     /**
      * @dataProvider incorrectProvider
      */
-    public function testErorr($data, $exception)
+    public function testError($data, $exception)
     {
         $this->expectException($exception);
         $this->parser->parse($data);
