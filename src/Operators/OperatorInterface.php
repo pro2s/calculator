@@ -3,8 +3,9 @@
 namespace Parser\Operators;
 
 use Parser\Operands\OperandInterface;
+use Parser\TokenInterface;
 
-interface OperatorInterface
+interface OperatorInterface extends TokenInterface
 {
     /**
      * @return numeric

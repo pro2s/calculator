@@ -41,4 +41,9 @@ abstract class AbstractOperator implements OperatorInterface
     {
         return (int) static::ARGUMENTS_COUNT;
     }
+
+    public function isValue(): bool
+    {
+        return false;
+    }
 }

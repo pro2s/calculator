@@ -31,4 +31,9 @@ class DecimalOperand implements OperandInterface
     {
         return $this->value;
     }
+
+    public function isValue(): bool
+    {
+        return true;
+    }
 }

@@ -16,34 +16,42 @@ class RPNCalculator implements CalculatorInterface
         $this->operandFactory = $operandFactory;
     }
 
-    /**
-     * @param \Iterator<OperatorInterface|OperandInterface> $tokens
-     * @throws RuntimeException
-     */
     public function calculate(\Iterator $tokens)
     {
-        $operands = [];
+        /** @var \SplStack<OperandInterface> $operands */
+        $operands = new \SplStack();
 
         foreach ($tokens as $token) {
             if ($token instanceof OperandInterface) {
-                $operands[] = $token;
+                $operands->push($token);
             } else {
                 $count = $token->getArgumentsCount();
-                if ($count > count($operands)) {
-                    throw new RuntimeException('Wrong arguments');
-                }
-                /** @var list<OperandInterface> $arguments */
-                $arguments = \array_splice($operands, -$count);
-
-                $operands[] = $this->operandFactory->create($token->apply(...$arguments));
+                $arguments = $this->getArguments($operands, $count);
+                $value = $token->apply(...$arguments);
+                $operands->push($this->operandFactory->create($value));
             }
         }
 
-        $operand = end($operands);
-        if ($operand instanceof OperandInterface) {
-            return $operand->getValue();
+        if ($operands->isEmpty()) {
+            throw new RuntimeException('Unexpected result');
         }
 
-        throw new RuntimeException('Unexcepted result');
+        $operand = $operands->pop();
+
+        return $operand->getValue();
+    }
+
+    private function getArguments(\SplStack $operands, int $count): \SplStack
+    {
+        if ($count > $operands->count()) {
+            throw new RuntimeException('Wrong arguments');
+        }
+
+        $arguments = new \SplStack();
+        while ($count-- > 0) {
+            $arguments->push($operands->pop());
+        }
+
+        return $arguments;
     }
 }

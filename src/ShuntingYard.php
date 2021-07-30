@@ -25,15 +25,9 @@ use Parser\Syntax\CloseBracket;
 
 class ShuntingYard implements ParserInterface
 {
-    /**
-     * @var Tokinizer
-     */
     private Tokinizer $tokenizer;
 
-    /**
-     * @var CalculatorInterface
-     */
-    private $calculator;
+    private CalculatorInterface $calculator;
 
     public function __construct()
     {
