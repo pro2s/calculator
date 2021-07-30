@@ -1,16 +1,14 @@
 <?php
 
-namespace Parser\Tests;
-
 use PHPUnit\Framework\TestCase;
 use Parser\ShuntingYard;
 use Parser\Exceptions\ParseException;
 use Parser\Exceptions\SyntaxException;
 use Parser\Exceptions\RuntimeException;
 
-class ParserTest extends TestCase
+final class ParserTest extends TestCase
 {
-    private $parser;
+    private ShuntingYard $parser;
 
     public function setUp(): void
     {
@@ -19,13 +17,17 @@ class ParserTest extends TestCase
 
     /**
      * @dataProvider correctIntProvider
+     * @param string $data
+     * @param numeric $result
+     * @throws ParseException
+     * @throws RuntimeException
      */
-    public function testIntParse($data, $result)
+    public function testIntParse(string $data, $result): void
     {
         $this->assertSame($result, $this->parser->parse($data));
     }
 
-    public function correctIntProvider()
+    public function correctIntProvider(): array
     {
         return [
             '1+12' => ['1+12', 13],
@@ -45,19 +47,19 @@ class ParserTest extends TestCase
     /**
      * @dataProvider incorrectProvider
      */
-    public function testErorr($data, $exception)
+    public function testError(string $data, string $exception): void
     {
         $this->expectException($exception);
         $this->parser->parse($data);
     }
 
-    public function incorrectProvider()
+    public function incorrectProvider(): array
     {
         return [
             'SyntaxException' => ['1$1', SyntaxException::class],
             'ParseException' => ['2((1', ParseException::class],
             'RuntimeException' => ['2/0', RuntimeException::class],
-            'RuntimeException' => ['2 ^ (1 + )', RuntimeException::class],
+            'RuntimeException brackets' => ['2 ^ (1 + )', RuntimeException::class],
         ];
     }
 }

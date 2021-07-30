@@ -9,8 +9,8 @@ abstract class BasicOperator extends AbstractOperator
         return self::LEFT;
     }
 
-    public function getPercendence(): int
+    public function getPrecedence(): int
     {
-        return self::BASIC_PERCENDENCE;
+        return self::BASIC_PRECEDENCE;
     }
 }

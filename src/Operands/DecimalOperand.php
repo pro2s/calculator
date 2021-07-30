@@ -2,7 +2,6 @@
 
 namespace Parser\Operands;
 
-use Parser\Exceptions\ParseException;
 use Parser\Exceptions\SyntaxException;
 
 class DecimalOperand implements OperandInterface
@@ -14,6 +13,7 @@ class DecimalOperand implements OperandInterface
 
     /**
      * @param mixed $value
+     * @throws SyntaxException
      */
     public function __construct($value)
     {

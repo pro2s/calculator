@@ -13,11 +13,14 @@ class EmptyOperator extends AbstractOperator
         return self::LEFT;
     }
 
-    public function getPercendence(): int
+    public function getPrecedence(): int
     {
-        return self::EMPTY_PERCENDENCE;
+        return self::EMPTY_PRECEDENCE;
     }
 
+    /**
+     * @throws RuntimeException
+     */
     public function apply(OperandInterface ...$operands)
     {
         throw new RuntimeException('Operator can not be applied');

@@ -5,12 +5,11 @@ namespace Parser\Calculators;
 use Parser\Operands\OperandInterface;
 use Parser\Exceptions\RuntimeException;
 use Parser\Operators\OperatorInterface;
-use Parser\Calculators\CalculatorInterface;
 use Parser\Operands\OperandFactoryInterface;
 
 class RPNCalculator implements CalculatorInterface
 {
-    private $operandFactory;
+    private OperandFactoryInterface $operandFactory;
 
     public function __construct(OperandFactoryInterface $operandFactory)
     {
@@ -19,6 +18,7 @@ class RPNCalculator implements CalculatorInterface
 
     /**
      * @param \Iterator<OperatorInterface|OperandInterface> $tokens
+     * @throws RuntimeException
      */
     public function calculate(\Iterator $tokens)
     {

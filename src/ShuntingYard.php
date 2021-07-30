@@ -2,11 +2,11 @@
 
 namespace Parser;
 
+use Generator;
+use Iterator;
 use Parser\Calculators\CalculatorInterface;
 use Parser\Calculators\RPNCalculator;
 use Parser\Exceptions\ParseException;
-use Parser\Exceptions\SyntaxException;
-use Parser\Exceptions\RuntimeException;
 use Parser\Functions\Min;
 use Parser\Functions\Sqrt;
 use Parser\Functions\FunctionOperator;
@@ -19,7 +19,6 @@ use Parser\Operators\Mult;
 use Parser\Operators\OperatorInterface;
 use Parser\Operands\DecimalFactory;
 use Parser\Operands\OperandInterface;
-use Parser\Operands\OperandFactoryInterface;
 use Parser\Syntax\Comma;
 use Parser\Syntax\OpenBracket;
 use Parser\Syntax\CloseBracket;
@@ -29,7 +28,7 @@ class ShuntingYard implements ParserInterface
     /**
      * @var Tokinizer
      */
-    private $tokenizer;
+    private Tokinizer $tokenizer;
 
     /**
      * @var CalculatorInterface
@@ -38,9 +37,10 @@ class ShuntingYard implements ParserInterface
 
     public function __construct()
     {
-        $this->calculator = new RPNCalculator(new DecimalFactory());
+        $operand = new DecimalFactory();
+        $this->calculator = new RPNCalculator($operand);
         $this->tokenizer = new Tokinizer(
-            new DecimalFactory(),
+            $operand,
             new Min(),
             new Sqrt(),
             new Add(),
@@ -57,6 +57,8 @@ class ShuntingYard implements ParserInterface
 
     /**
      * @return numeric
+     * @throws ParseException
+     * @throws Exceptions\RuntimeException
      */
     public function parse(string $string)
     {
@@ -69,11 +71,12 @@ class ShuntingYard implements ParserInterface
 
     /**
      * Implements of https://en.wikipedia.org/wiki/Shunting-yard_algorithm
-     * @param \Iterator<OperatorInterface|OperandInterface> $tokens
+     * @param Iterator<OperatorInterface|OperandInterface> $tokens
      *
-     * @return \Generator<OperatorInterface|OperandInterface>
+     * @return Generator<OperatorInterface|OperandInterface>
+     * @throws ParseException
      */
-    public function getRPN(\Iterator $tokens): \Generator
+    public function getRPN(Iterator $tokens): Generator
     {
         /** @var \SplStack<OperatorInterface> $stack */
         $stack = new \SplStack();

@@ -9,7 +9,10 @@ class Mod extends BasicOperator
 {
     protected const TOKEN = '%';
 
-    public function apply(OperandInterface ...$operands)
+    /**
+     * @throws RuntimeException
+     */
+    public function apply(OperandInterface ...$operands): int
     {
         [$operandA, $operandB] = $operands;
 

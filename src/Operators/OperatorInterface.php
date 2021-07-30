@@ -17,7 +17,7 @@ interface OperatorInterface
 
     public function getAssoc(): int;
 
-    public function getPercendence(): int;
+    public function getPrecedence(): int;
 
     public function getArgumentsCount(): int;
 }

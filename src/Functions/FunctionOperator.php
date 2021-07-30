@@ -2,7 +2,6 @@
 
 namespace Parser\Functions;
 
-use Parser\Operands\OperandInterface;
 use Parser\Operators\AbstractOperator;
 
 abstract class FunctionOperator extends AbstractOperator
@@ -12,8 +11,8 @@ abstract class FunctionOperator extends AbstractOperator
         return self::LEFT;
     }
 
-    public function getPercendence(): int
+    public function getPrecedence(): int
     {
-        return self::EMPTY_PERCENDENCE;
+        return self::EMPTY_PRECEDENCE;
     }
 }

@@ -11,17 +11,17 @@ class Tokinizer
     /**
      * @var OperatorInterface[]
      */
-    private $operators = [];
+    private array $operators = [];
 
     /**
      * @var string
      */
-    private $operatorsPattern = '';
+    private string $operatorsPattern = '';
 
     /**
      * @var OperandFactoryInterface
      */
-    private $operandFactory;
+    private OperandFactoryInterface $operandFactory;
 
     public function __construct(
         OperandFactoryInterface $operandFactory,

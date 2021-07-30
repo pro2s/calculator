@@ -3,7 +3,6 @@
 namespace Parser\Operators;
 
 use Parser\Operands\OperandInterface;
-use Parser\Operators\OperatorInterface;
 
 abstract class AbstractOperator implements OperatorInterface
 {
@@ -14,14 +13,14 @@ abstract class AbstractOperator implements OperatorInterface
     public const LEFT = 0;
     public const RIGHT = 1;
 
-    public const EMPTY_PERCENDENCE = 0;
-    public const BASIC_PERCENDENCE = 2;
-    public const SIMPLE_PERCENDENCE = 3;
-    public const COMPLEX_PERCENDENCE = 4;
+    public const EMPTY_PRECEDENCE = 0;
+    public const BASIC_PRECEDENCE = 2;
+    public const SIMPLE_PRECEDENCE = 3;
+    public const COMPLEX_PRECEDENCE = 4;
 
     abstract public function getAssoc(): int;
 
-    abstract public function getPercendence(): int;
+    abstract public function getPrecedence(): int;
 
     /**
      * @return numeric
@@ -35,7 +34,7 @@ abstract class AbstractOperator implements OperatorInterface
 
     public function lessOrEqual(OperatorInterface $operator): bool
     {
-        return $operator->getPercendence() >= $this->getPercendence() + $this->getAssoc();
+        return $operator->getPrecedence() >= $this->getPrecedence() + $this->getAssoc();
     }
 
     public function getArgumentsCount(): int
