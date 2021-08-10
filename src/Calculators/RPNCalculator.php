@@ -15,6 +15,9 @@ class RPNCalculator implements CalculatorInterface
         $this->operandFactory = $operandFactory;
     }
 
+    /**
+     * @throws RuntimeException
+     */
     public function calculate(\Iterator $tokens)
     {
         /** @var \SplStack<OperandInterface> $operands */
@@ -40,6 +43,9 @@ class RPNCalculator implements CalculatorInterface
         return $operand->getValue();
     }
 
+    /**
+     * @throws RuntimeException
+     */
     private function getArguments(\SplStack $operands, int $count): \SplStack
     {
         if ($count > $operands->count()) {

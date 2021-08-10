@@ -21,7 +21,6 @@ use Parser\Parser\ParserInterface;
 use Parser\Syntax\Comma;
 use Parser\Syntax\OpenBracket;
 use Parser\Syntax\CloseBracket;
-use Parser\TokenInterface;
 use Parser\Tokenizer;
 use SplStack;
 

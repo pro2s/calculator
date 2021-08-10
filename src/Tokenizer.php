@@ -75,6 +75,7 @@ class Tokenizer
     }
 
     /**
+     * @param string $string
      * @return \Generator<OperatorInterface|OperandInterface>
      */
     public function tokenize(string $string): \Generator
