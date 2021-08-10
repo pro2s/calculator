@@ -1,30 +1,35 @@
 <?php
 
+use Parser\Calculators\CalculatorInterface;
+use Parser\Operands\DecimalFactory;
+use Parser\Operands\OperandFactoryInterface;
+use Parser\Parser\ParserInterface;
 use PHPUnit\Framework\TestCase;
-use Parser\ShuntingYard;
 use Parser\Exceptions\ParseException;
 use Parser\Exceptions\SyntaxException;
 use Parser\Exceptions\RuntimeException;
 
-final class ParserTest extends TestCase
+abstract class ParserTest extends TestCase
 {
-    private ShuntingYard $parser;
+    protected ?ParserInterface $parser;
+    protected ?CalculatorInterface $calculator;
+
+    abstract function setupParser(OperandFactoryInterface $operandFactory): void;
 
     public function setUp(): void
     {
-        $this->parser = new ShuntingYard();
+        $this->setupParser(new DecimalFactory());
     }
 
     /**
      * @dataProvider correctIntProvider
      * @param string $data
      * @param numeric $result
-     * @throws ParseException
-     * @throws RuntimeException
      */
     public function testIntParse(string $data, $result): void
     {
-        $this->assertSame($result, $this->parser->parse($data));
+        $value = $this->calculate($data);
+        $this->assertSame($result, $value);
     }
 
     public function correctIntProvider(): array
@@ -51,7 +56,7 @@ final class ParserTest extends TestCase
     public function testError(string $data, string $exception): void
     {
         $this->expectException($exception);
-        $this->parser->parse($data);
+        $this->calculate($data);
     }
 
     public function incorrectProvider(): array
@@ -62,5 +67,15 @@ final class ParserTest extends TestCase
             'RuntimeException' => ['2/0', RuntimeException::class],
             'RuntimeException brackets' => ['2 ^ (1 + )', RuntimeException::class],
         ];
+    }
+
+    /**
+     * @param string $data
+     * @return float|int|string
+     */
+    public function calculate(string $data)
+    {
+        $tokens = $this->parser->parse($data);
+        return $this->calculator->calculate($tokens);
     }
 }

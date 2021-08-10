@@ -4,7 +4,6 @@ namespace Parser\Calculators;
 
 use Parser\Operands\OperandInterface;
 use Parser\Exceptions\RuntimeException;
-use Parser\Operators\OperatorInterface;
 use Parser\Operands\OperandFactoryInterface;
 
 class RPNCalculator implements CalculatorInterface
